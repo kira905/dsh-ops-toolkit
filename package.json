@@ -1,0 +1,56 @@
+{
+  "name": "@kira905/dsh-ops-toolkit",
+  "version": "0.1.0",
+  "description": "DeepSeek Harness (DSH) operations & upgrade toolkit: backups, self-check, snapshots, upgrade audit/recovery/silence windows, plugged-in protection.",
+  "license": "AGPL-3.0-only",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "dsh-boot-sync": "dsh-boot-sync.mjs",
+    "dsh-bootstrap": "dsh-bootstrap.mjs",
+    "dsh-dl-scheduler": "dsh-dl-scheduler.mjs",
+    "dsh-maintenance": "dsh-maintenance.mjs",
+    "dsh-upgrade-audit": "dsh-upgrade-audit.mjs",
+    "dsh-upgrade-recover": "dsh-upgrade-recover.mjs",
+    "dsh-upgrade-silence": "dsh-upgrade-silence.mjs",
+    "dsh-upgrade-watch": "dsh-upgrade-watch.mjs",
+    "overnight-guard-check": "overnight-guard-check.mjs",
+    "overnight-mode": "overnight-mode.mjs",
+    "snapshot-upgrade-pre": "snapshot-upgrade-pre.mjs",
+    "upgrade-triage-cli": "upgrade-triage-cli.mjs"
+  },
+  "files": [
+    "*.mjs",
+    "*.ps1",
+    "lib/",
+    "README.md",
+    "README.en.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "ops",
+    "backup",
+    "upgrade",
+    "recovery",
+    "windows",
+    "powershell",
+    "toolkit"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kira905/dsh-ops-toolkit.git"
+  },
+  "homepage": "https://github.com/kira905/dsh-ops-toolkit#readme",
+  "bugs": {
+    "url": "https://github.com/kira905/dsh-ops-toolkit/issues"
+  }
+}

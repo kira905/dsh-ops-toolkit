@@ -1,0 +1,7 @@
+* text=auto eol=lf
+# .ps1 / .cmd 原样入库（UTF-8 BOM + CRLF 是本仓铁律，别让 git 规范化改写）
+*.ps1 -text
+*.cmd -text
+*.png binary
+*.zip binary
+*.tgz binary
