@@ -1,6 +1,6 @@
 {
   "name": "@kira905/dsh-ops-toolkit",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "DeepSeek Harness (DSH) operations & upgrade toolkit: backups, self-check, snapshots, upgrade audit/recovery/silence windows, plugged-in protection.",
   "license": "AGPL-3.0-only",
   "private": false,
