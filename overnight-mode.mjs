@@ -103,6 +103,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { cliGuard } from './lib/cli-args.mjs';
 import { resolveDshHome } from './lib/dsh-home.mjs';
 // 【2026-10-09 · 卡「360弹窗治本-pwsh7」】PowerShell 一律走统一工具（pwsh 7 优先）：
 //   360 企业版 EDR 只对 5.1（powershell.exe）弹「PowerShell 命令执行攻击」；工具缺失 ⇒ 兜底 5.1。
@@ -2093,8 +2094,40 @@ function parseArgs(argv) {
   return { opts, command: positional[0] || null, positional };
 }
 
+const SPEC = {
+  cmd: 'overnight-mode',
+  summary: '插电保护：插电时把睡眠 / 休眠 / 关屏 / 合盖 / 屏保全部压住（不空闲、不休眠、不锁屏），拔电宽限后自动恢复；auto 是自动切换档。',
+  usage: 'overnight-mode <auto|on|off|status|adopt> [选项]',
+  commands: [
+    { name: 'on', desc: '开保护：备份当前电源设置后，把所有会让机器睡下的设置改成「永不」' },
+    { name: 'off', desc: '关保护：按备份恢复原设置' },
+    { name: 'status', desc: '只看当前是否在保护中（只读）' },
+    { name: 'auto', desc: '自动档：插电开、拔电宽限后关；由定时任务驱动' },
+    { name: 'adopt', desc: '接管既有状态（把当前设置认作基线）' },
+  ],
+  flags: [
+    { name: '--dry-run', desc: '只打印将改什么，不落地' },
+    { name: '--force', desc: '忽略个别检查强行执行' },
+    { name: '--no-wu', desc: '不碰 Windows 更新相关的加固' },
+    { name: '--with-wu', desc: '兼容用（现在默认就做，no-op）' },
+    { name: '--wu-window', arg: '开始-结束', desc: 'Windows 更新禁重启窗口，如 21-15' },
+    { name: '--no-relay', desc: '本次不放行会话接力 job（不动任何 job 开关）' },
+    { name: '--no-events', desc: '不发事件通知' },
+    { name: '--json', desc: '机器可读输出' },
+    { name: '--import-from', arg: '目录', desc: '从指定目录导入既有状态' },
+    { name: '--file', arg: 'GUID=路径', desc: '按方案 GUID 指定要处理的电源方案文件，可重复' },
+    { name: '--grace-minutes', arg: 'N', desc: 'auto 档：拔电后宽限多少分钟再恢复，默认 10' },
+    { name: '--verify-hours', arg: 'N', desc: 'auto 档：真核自愈间隔小时数，0 = 关' },
+    { name: '--self-test', desc: '跑内置自测，不碰本机电源设置' },
+  ],
+  writes: 'on / off / auto 会改本机电源与屏保设置（改前先备份原值），写状态文件并发事件；标记开机自动执行时可能创建计划任务。--dry-run 只打印计划；status 只读。',
+  dryRun: '加 --dry-run 只打印将改什么，不改任何设置。',
+  exits: '0 成功 · 1 执行失败 · 2 用法错 · 3 环境不可用 · 4 需要管理员 · 5 主机不匹配',
+  examples: ['overnight-mode status', 'overnight-mode on --dry-run'],
+};
+
 function main() {
-  const argv = process.argv.slice(2);
+  const argv = cliGuard(SPEC);
   if (argv.includes('--self-test')) return selfTest();
   const parsed = parseArgs(argv);
   if (parsed.error) {

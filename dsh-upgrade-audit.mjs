@@ -21,9 +21,26 @@ import path from 'node:path';
 import os from 'node:os';
 // 2026-09-14 环境边界：profile 根走统一解析（BUTLER_DSH_HOME > DSH_HOME > ~/.dsh）
 import { resolveDshHome } from './lib/dsh-home.mjs';
+import { cliGuard } from './lib/cli-args.mjs';
 
-const SELF_TEST = process.argv.includes('--self-test');
-const ROOT = (SELF_TEST ? null : process.argv[2]) || path.join(os.homedir(), 'dsh-offsync', 'upgrade-canary', 'tarballs');
+const SPEC = {
+  cmd: 'dsh-upgrade-audit',
+  summary: '升级前 L0 预检：把目标版 SDK 的导出面、新版与本地插件的 import 面、主包内置包样本、运行时 API 面逐项对一遍，提前抓断裂面。',
+  usage: 'dsh-upgrade-audit [样本目录] [--self-test]',
+  flags: [{ name: '--self-test', desc: '跑隔离夹具自测（不读样本、不联网、不写报告）' }],
+  positional: [{ name: '[样本目录]', desc: '放新版 tarball 的目录（缺省取用户目录下的升级候选目录）' }],
+  env: [
+    { name: 'DSH_API_TARGET', desc: '运行时 API 面核对的目标版本' },
+    { name: 'DSH_HOME', desc: '要核对的 profile 所在数据根' },
+  ],
+  writes: '只读样本与本机已装插件；默认写一份人读报告到工作区临时目录（--self-test 不写、不联网）。',
+  exits: '0 完成 · 1 有阻断项或运行失败 · 2 参数错误',
+  examples: ['dsh-upgrade-audit --self-test', 'dsh-upgrade-audit ./tarballs'],
+};
+const AUDIT_ARGV = cliGuard(SPEC);
+
+const SELF_TEST = AUDIT_ARGV.includes('--self-test');
+const ROOT = (SELF_TEST ? null : AUDIT_ARGV[0]) || path.join(os.homedir(), 'dsh-offsync', 'upgrade-canary', 'tarballs');
 const PROFILE = path.join(resolveDshHome(), 'profiles', 'web');
 // 运行时 API 面核对的目标线（T7 · 2026-09-10 新增）。
 // ⚠️ 随主包目标线更新；也可用 env 覆盖：DSH_API_TARGET=0.1.5-rc.1

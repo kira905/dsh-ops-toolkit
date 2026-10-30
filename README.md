@@ -11,12 +11,16 @@ DeepSeek Harness（DSH）的**运维与升级工具箱**：备份采集、宿主
 
 ---
 
-## ⚠️ 先读这一条：本批脚本**没有 `--help` 实现**
+## ℹ️ 先读这一条：帮助与参数闸
 
-`--help` 对这些脚本**不是一个被识别的开关**——未识别的参数会被**忽略，然后按默认动作直接执行**
+`dsh-upgrade-audit` · `overnight-mode` · `snapshot-upgrade-pre` 这 3 件（2026-10-30 起）已支持
+`--help`（打印用法、退出码 0）与**未知参数拒收**（退出码 2，绝不执行动作）；用法文本会写清「这个命令会写什么」。
+
+其余脚本（`dsh-maintenance` · `dsh-bootstrap` · `dsh-boot-sync` · `dsh-dl-scheduler` · `dsh-upgrade-*` 等）
+仍是旧行为：`--help` **不是被识别的开关**，未识别的参数会被**忽略，然后按默认动作直接执行**
 （例如 `dsh-maintenance.mjs --help` 会走它的默认分支，不是打印帮助）。
 
-⇒ 请**按下面「真实用法」表**调用；拿不准时**只跑只读项**（`--check` / `--plan` / `--status` /
+⇒ 未接入的那批请**按下面「真实用法」表**调用；拿不准时**只跑只读项**（`--check` / `--plan` / `--status` /
 `--dry-run` / `--list` / `--self-test`）。
 
 ---

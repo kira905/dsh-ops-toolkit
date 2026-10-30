@@ -51,6 +51,7 @@ import os from 'node:os';
 import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { cliGuard } from './lib/cli-args.mjs';
 
 // ---------------------------------------------------------------------------
 // 0. 路径与参数
@@ -63,7 +64,29 @@ const SELF = (() => {
   return fileURLToPath(import.meta.url);
 })();
 const TOOLS_DIR = path.dirname(SELF);
-const argv = process.argv.slice(2);
+const SPEC = {
+  cmd: 'snapshot-upgrade-pre',
+  summary: '「升级前一刻」快照：抓会因主包升级而变的那几面（主包树 / profile 四件套 / 配置 / 清单），给升级失败留回退点。',
+  usage: 'snapshot-upgrade-pre [--out <目录>] [--apply] [--verify] [--json]',
+  flags: [
+    { name: '--out', arg: '目录', desc: '快照落点（缺省为归档目录下的 upgrade-pre-<时间戳>）' },
+    { name: '--ts', arg: '串', desc: '自定义时间戳（默认当前时间）' },
+    { name: '--home', arg: '目录', desc: '要快照的 DSH 数据根' },
+    { name: '--backup', arg: '目录', desc: '--verify 时要核对的那份快照' },
+    { name: '--presets', arg: '名', desc: '只取指定 preset' },
+    { name: '--apply', desc: '真写快照（不带就是干跑）' },
+    { name: '--force', desc: '目标已存在时覆盖' },
+    { name: '--no-tree', desc: '不抓整树 tar' },
+    { name: '--no-entities', desc: '不抓实体文件清单' },
+    { name: '--verify', desc: '只核对既有快照完整性，不新抓' },
+    { name: '--json', desc: '只吐 JSON 摘要' },
+  ],
+  writes: '默认干跑。带 --apply 会在 --out 目录真写真快照（含 tar 包与清单）；--verify 只读快照做核对。',
+  dryRun: '默认就是干跑；加 --apply 才落盘。',
+  exits: '0 成功 · 1 采集或核对失败 · 2 参数错误',
+  examples: ['snapshot-upgrade-pre', 'snapshot-upgrade-pre --apply --out ./pre-upgrade'],
+};
+const argv = cliGuard(SPEC);
 const has = (n) => argv.includes(n) === true;
 function arg(name, def = null) {
   const i = argv.indexOf(name);

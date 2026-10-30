@@ -13,12 +13,16 @@ windows, and "plugged-in protection" (no sleep / no hibernate / no display-off).
 
 ---
 
-## ⚠️ Read first: these scripts have **no `--help` implementation**
+## ℹ️ Read first: help & argument gate
 
-`--help` is **not a recognized switch**. Unrecognized arguments are **ignored and the default action runs**
+`dsh-upgrade-audit` · `overnight-mode` · `snapshot-upgrade-pre` (since 2026-10-30) implement `--help`
+(prints usage, exit 0) and **reject unknown arguments** (exit 2, never executes anything); each usage text says what the command writes.
+
+The remaining scripts (`dsh-maintenance` · `dsh-bootstrap` · `dsh-boot-sync` · `dsh-dl-scheduler` · `dsh-upgrade-*` …)
+keep the old behaviour: `--help` is **not a recognized switch**, unrecognized arguments are **ignored and the default action runs**
 (for example `dsh-maintenance.mjs --help` takes its default branch instead of printing help).
 
-⇒ Use the "Real usage" column below. When unsure, run only read-only entries
+⇒ For those, use the "Real usage" column below. When unsure, run only read-only entries
 (`--check` / `--plan` / `--status` / `--dry-run` / `--list` / `--self-test`).
 
 ---
