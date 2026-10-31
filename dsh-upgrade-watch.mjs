@@ -44,7 +44,7 @@ const GITHUB_REPOS = [
   //   社区规范类源（下面几项只有本线盯）；dsh-upstream-watch.mjs = **内容面**（提交/符号/断裂面）。
   //   结论行目前在各自主报告里并列，未做合并核对（见 docs\跨机同步-A2-接线收口-交付报告-20260917.md §D-1）。
   { key: 'official-deepseek-harness', owner: 'deepseek-ai', repo: 'deepseek-harness', label: '官方 deepseek-ai/deepseek-harness' },
-  // 2026-10-19 现查（卡主线「生态核查-升级开源与adapter」）：`Yan-Zero/dsh-std` 已 GitHub **301 重定向**
+  // 2026-10-19 现查（在一次生态核查里）：`Yan-Zero/dsh-std` 已 GitHub **301 重定向**
   //   到 `T-Auto/dsh-std`（★158 · 最近 push 2026-10-10 · 未归档）⇒ 跟上真实 owner。
   //   别指望重定向永久有效：源仓一旦被删/再改名，旧路径就真断（改前实测旧路径仍可取数，故非"当场坏了"）。
   { key: 'dsh-std', owner: 'T-Auto', repo: 'dsh-std', label: '元协议 T-Auto/dsh-std' },

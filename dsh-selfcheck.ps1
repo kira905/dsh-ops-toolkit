@@ -26,7 +26,7 @@
 
   回滚点：_archive\selfcheck-l17-20260923-1556\（restore-selfcheck.mjs + 桌面 restore-selfcheck.cmd）
 
-  L-18（2026-09-25 · 卡 1ceb9071）[2] 段 JSON 健康两项修复：
+  L-18（2026-09-25）[2] 段 JSON 健康两项修复：
     a) 解析器换 node（tools\json-health-scan.mjs）：PS ConvertFrom-Json 有两处结构性假红 —— ① 属性名大小写
        不敏感 ⇒ 合法 package-lock.json 报「名称为空字符串的属性 / 键大小写不同」；② 按代码页解码 ⇒ 合法
        UTF-8 中文 JSON 报「Unexpected character: 清」。实测 14 条 FAIL 无一条是真故障。

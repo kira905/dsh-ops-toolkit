@@ -221,7 +221,7 @@ function Write-CopyFailureLedger {
 
 # 采集分步计时（R5 报告 §8-R5 · 2026-10-14 · 主人拍板「R5-Q2」）：把 collect / add / status / commit
 #   各段耗时并进采集台账。为什么：2026-10-14 那次 600s 超时，事后只能靠外围物证（台账 mtime / index
-#   状态 / reflog / fsck）反推「卡在哪一步」，成本极高（见 docs\交付报告-愿景核查-R5-Depart采集超时归因-20261014.md）；
+#   状态 / reflog / fsck）反推「卡在哪一步」，成本极高（见内部归因记录）；
 #   有了这几个数，下次一眼就能分辨「搬运慢」还是「git 收尾慢」。
 # 纯新增字段：不改控制流、不改退出码；写失败只告警，绝不影响采集/提交结果（fail-open）。
 # 台账路径经 $env:DSH_COLLECT_FAILURE_LEDGER 可注入 ⇒ 夹具演练不会碰生产台账。
