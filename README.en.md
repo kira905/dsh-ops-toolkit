@@ -2,6 +2,27 @@
 
 English (default here) · [中文](README.md)
 
+> ### What this is
+> **16 zero-dependency ops scripts**: boot sync, self-check, backups, snapshots, audited upgrades and rollback, plugged-in protection.
+>
+> ### What it solves
+> The things that actually kill a long-running machine: every path changes after a machine move (`dsh-boot-sync` realigns them in one pass), an upgrade dies halfway (audited upgrade with rollback), nobody backed up before the change (backup and snapshot), and Windows Update reboots the box at night (plugged-in protection blocks it).
+>
+> ### Run it in one command
+> ```powershell
+> npm i -g @kira905/dsh-ops-toolkit
+> dsh-boot-sync --dry-run    # see what it would realign
+> ```
+>
+> ### Real output
+> ```text
+> Usage: node dsh-boot-sync.mjs [--dry-run] [--no-pull] [--root-only] [--force] [--closure-fail-close] [--self-test]
+>   isolation / path overrides: --root <prod root> --home <DSH_HOME> --repo-ws ... --repo-core ... --repo-sessions ...
+>   --closure-fail-close: escalate a polluted closure link from warning to a blocking item
+> ```
+
+---
+
 Operations and upgrade tooling for **DeepSeek Harness (DSH)**: backup collection, host bootstrap checks,
 environment self-check, plugin snapshots, upgrade-package audit, upgrade-lock recovery, upgrade silence
 windows, and "plugged-in protection" (no sleep / no hibernate / no display-off).
