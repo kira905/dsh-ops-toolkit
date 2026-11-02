@@ -2,6 +2,27 @@
 
 [English](README.en.md) · 中文（默认）
 
+> ### 这是什么
+> **运维与升级的 16 个零依赖脚本**：开机同步、自检、备份、快照、受控升级与回滚、插电保护。
+>
+> ### 它解决什么
+> 一台长期在跑的机器，真正会要命的是这几件事：换机器之后路径全变了（`dsh-boot-sync` 一次对齐）、升级升到一半断了（受控升级带审计与回滚）、改之前忘了备份（备份与快照）、夜里被 Windows 更新重启掉（插电保护顺手堵住）。
+>
+> ### 一条命令跑起来
+> ```powershell
+> npm i -g @kira905/dsh-ops-toolkit
+> dsh-boot-sync --dry-run    # 先看它要对齐什么（真跑要加 --go 之类，见仓内 README）
+> ```
+>
+> ### 先看它长什么样（真实输出）
+> ```text
+> 用法: node dsh-boot-sync.mjs [--dry-run] [--no-pull] [--root-only] [--force] [--closure-fail-close] [--self-test]
+>       隔离/换路径: --root <生产根> --home <DSH_HOME> --repo-ws <仓3> --repo-core <仓1> --repo-sessions <仓2>
+>       --closure-fail-close: 闭包指向有污染时升级为阻断项（默认告警档，不阻断）
+> ```
+
+---
+
 > **本仓是命令行工具，不挂宿主界面，不需要 `dsh.bundle`、不需要写 `cordis.patch.yml`。** 装它 = `npm i -g @kira905/dsh-ops-toolkit`（或 `npx -p @kira905/dsh-ops-toolkit dsh-upgrade-watch`）。装进 profile 也对，但那条 `declares no dsh.bundle` 警告是**正常现象**，不是故障。
 
 ## 装完自检（三条只读验法）
