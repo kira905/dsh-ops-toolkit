@@ -17,7 +17,7 @@
 #
 # 2026-09-09 改造（防跨机互相 purge，与仓2 dsh-backup-sessions.ps1 同一修法）：
 #   采集由 /MIR（镜像+purge）改为 /E（增量，不删目标端多余文件）——旧版两台机器各自 -Sync
-#   会把对方 push 的独有文件从工作副本删掉并推回远端（实测仓2 因此丢掉 ROG 68 个会话）。
+#   会把对方 push 的独有文件从工作副本删掉并推回远端（实测仓2 因此丢掉设备 A 的 68 个会话）。
 #   -Sync 追加 git pull，让工作副本拿到另一台机的最新提交；确需清理「本机已删、仓里还在」
 #   的文件时用 -Prune（显式回到 /MIR 语义，跑之前先确认对方机器已同步）。
 #
@@ -361,7 +361,7 @@ function Remove-StaleTracked {
 # ---------- 推前超集体检（挡推保护 · P9 H0 2026-09-10 补）----------
 # 为什么：采集是 robocopy /E 覆盖式 —— 工作副本里若存在生产没有的内容（别的机器推上来、
 #   还没分发回本机的），下一次 -Sync 就会抹掉它，再 -Push 就永久丢失。
-#   实测先例（2026-09-10 09:07）：本机 -Sync 覆盖掉仓3 里 TUF 版 8 份文档（插件魔改维护清单等）。
+#   实测先例（2026-09-10 09:07）：本机 -Sync 覆盖掉仓3 里设备 B 侧的 8 份文档（插件魔改维护清单等）。
 # 判据：复用 tools\lib\repo-superset.mjs（与 tools\check-repo-superset.mjs 同一份逻辑）的
 #   **blockingLines**（CLI `--blocking-only`）= 仓里有、生产没有**且判不出可回退**的行（exit 1 = 命中）。
 #   2026-09-16 卡「push-gate 对齐」：本门与 handoff.mjs --depart 前置体检、仓1 同款门**同一套口径**
@@ -388,10 +388,10 @@ function Invoke-SupersetCheck {
     if (-not (Test-Path $tool)) { throw "推前超集体检工具缺失：$tool（fail-closed：拒绝继续）" }
     $node = Get-NodeExe
     if (-not $node) { throw '找不到 node.exe（fail-closed：拒绝继续）' }
-    # ⚠️ 编码铁律（2026-09-16 根因 · TUF 实测）：CLI 的 --json 是 **UTF-8** 输出；若本进程
+    # ⚠️ 编码铁律（2026-09-16 根因 · 设备 B 实测）：CLI 的 --json 是 **UTF-8** 输出；若本进程
     #   [Console]::OutputEncoding 是系统代码页（中文机 936/GBK），PowerShell 捕获原生命令输出时
     #   会按 GBK 解码 → 多字节中文错位 → JSON 里的引号/反斜杠被吃 → ConvertFrom-Json 失败 →
-    #   gate 读不到 → 下方 fail-closed 误挡推送（TUF depart 被 PUSH BLOCKED 的真因，被挡内容其实零风险）。
+    #   gate 读不到 → 下方 fail-closed 误挡推送（设备 B depart 被 PUSH BLOCKED 的真因，被挡内容其实零风险）。
     #   修法：捕获期间临时切 UTF-8，捕获完**立刻还原**（不影响脚本自身中文输出的编码）。
     $savedOe = [Console]::OutputEncoding
     try { [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false) } catch { }
@@ -448,7 +448,7 @@ function Assert-PushSafe {
     $res = Invoke-SupersetCheck
     if ($res.VersionMismatch) {
         # 2026-09-16（卡 AT12 · C 项）：fail-closed 不等于「内容冲突」——把**真因**分流打在屏幕上，
-        # 不再只喊一句 PUSH BLOCKED（今天在 TUF 上因此耗掉一整轮排查：真因是控制台编码，不是内容风险）。
+        # 不再只喊一句 PUSH BLOCKED（今天在设备 B 上因此耗掉一整轮排查：真因是控制台编码，不是内容风险）。
         Write-Warn2 'XX 真因诊断（gate 栏缺失 ⇒ 无法确认工具支持 --blocking-only；**不是**内容冲突）：'
         Write-Warn2 '   ① 编码：本进程 [Console]::OutputEncoding 非 UTF-8 时，node 的 UTF-8 JSON 会被按系统代码页解码 → 引号被吃 → gate 读不到。'
         Write-Warn2 '      本脚本已内置「捕获期间切 UTF-8 + 捕获后还原」；手工在别的 shell 跑同样会踩，先切再跑：'

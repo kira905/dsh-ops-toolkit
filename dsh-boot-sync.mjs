@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * dsh-boot-sync.mjs —— 接机一键对齐（ROG/TUF 双机通用 · 停机段执行）
+ * dsh-boot-sync.mjs —— 接机一键对齐（设备 A/设备 B 双机通用 · 停机段执行）
  *
  * 把「开机前 9 步」压缩成一条命令：
  *   ① 只读收仓（git pull --ff-only 三仓，不采集、不推送）

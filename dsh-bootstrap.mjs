@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // dsh-butler / dsh-bootstrap.mjs —— C 类 bootstrap（P9 H3 · 方案 §4.2 第 4 动作「部署 C 类」）
 //
-// 解决什么（2026-09-15 ROG→TUF 换机实测）：
+// 解决什么（2026-09-15 设备 A→设备 B 换机实测）：
 //   插件实体 / 调度常驻 / 桌面入口 / 全局 npm 补丁 / 配置恢复**都不在任何仓里**（机器级状态），
 //   换机后靠人记（docs\换机必补清单.md 是清单，但没人执行）。本工具把它变成**一条命令**：
 //
@@ -87,7 +87,7 @@ export function closureLinkCount(nm = path.join(profileDir(), 'node_modules')) {
   return { total: dirs.length, links };
 }
 
-/** 调度（本机 ROG = tickd 常驻；TUF = Windows 计划任务）。 */
+/** 调度（设备 A = tickd 常驻；设备 B = Windows 计划任务）。 */
 export function schedulerStatus() {
   const tickd = path.join(butlerDir(), 'butler-tickd.mjs');
   let tickdRunning = false;

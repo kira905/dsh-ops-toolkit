@@ -10,7 +10,7 @@
  *   会把另一方还需要的静默窗打开（一个停 tickd、一个放 tickd，两边都以为是自己该管的）。
  *   v2 里"谁开着"= `holders` 的键集合：**最后一个持有者释放时才真恢复自动化**。
  *
- * 覆盖两种形态（2026-09-11 起本机是前者，TUF / 历史形态是后者）：
+ * 覆盖两种形态（2026-09-11 起本机是前者，设备 B / 历史形态是后者）：
  *   A. tickd 常驻进程（node butler-tickd.mjs，各 tick 全在里面）→ --stop / --ensure
  *   B. Windows 计划任务 DSH-Butler-*（Daily/Weekly/各 Tick）            → Disable/Enable-ScheduledTask
  *

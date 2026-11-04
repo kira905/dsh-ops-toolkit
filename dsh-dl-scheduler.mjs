@@ -7,7 +7,7 @@
  *   - 多任务队列：按速度加权轮询，把不同任务分给不同网卡（互不抢带宽）
  *   - 单任务：若源站支持 HTTP Range，按速度比例分段，各段绑定不同网卡并行下载后合并
  *
- * 设计约束（跨设备通用，ROG / TUF 两台机都直接用）：
+ * 设计约束（跨设备通用，设备 A / 设备 B 两台机都直接用）：
  *   - 零依赖：纯 Node 标准库（node >= 18，fetch 不需要，用 http/https + localAddress）
  *   - 不硬编码用户名/路径：状态文件默认 <DSH_ROOT>\_tmp\dl-queue（可用 DSH_DL_DIR 覆盖）
  *   - 网卡自动枚举（os.networkInterfaces），类型有线/无线按名字启发式识别
