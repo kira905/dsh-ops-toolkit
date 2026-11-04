@@ -291,9 +291,18 @@ const TASKS = {
       log("[复核] 判据 4（身份表缺位 ⇒ 预期 exit 2「不可用」，不是失败）：");
       run(process.execPath, [path.join(MEMTOOLS, "memory-identity-check.mjs"), "--db", PROD_DB]);
       log("[复核] ⑤-4 撤回链可用性（预期不再 fail-closed exit 3）：");
-      const r = run(process.execPath, [path.join(DSH, "tools", "dsh-butler", "memory-retract.mjs"), "--dry-run", "--user", "LiJianXiao"]);
-      ctx.retractStatus = r.status;
-      log(`      → memory-retract --dry-run exit=${r.status}`);
+      // ⚠️ 这里**不许写死任何 userid**：本包公开发布，字面量等于把作者账号一起发出去（2026-11-04 卡）。
+      //    撤回必须指定 --user，所以未配置时**跳过并说明原因** —— 不静默跑空参数（那会伪造一个"已验过"的假象）。
+      const ownerUser = String(process.env.DSH_OWNER_USER ?? "").trim();
+      if (!ownerUser) {
+        ctx.retractStatus = null;
+        ctx.retractSkipped = "未配置 $DSH_OWNER_USER";
+        log("      → 跳过：未配置 $DSH_OWNER_USER（memory-retract 必须带 --user；不给就空跑，属噪音）");
+      } else {
+        const r = run(process.execPath, [path.join(DSH, "tools", "dsh-butler", "memory-retract.mjs"), "--dry-run", "--user", ownerUser]);
+        ctx.retractStatus = r.status;
+        log(`      → memory-retract --dry-run exit=${r.status}（--user ${ownerUser}）`);
+      }
       return after.cols.includes("owner_user") && after.cols.includes("visibility") && after.count === ctx.before.count;
     },
   },
@@ -491,7 +500,7 @@ async function main() {
         "- 迁移后：" + (ctx.after ? ctx.after.cols.length + " 列 / " + ctx.after.count + " 条（" + ctx.after.cols.join(", ") + "）" : "未取"),
         "- 复核通过：" + (ctx.verified ?? "未跑"),
         "- 快照：" + (ctx.snapshotDir ?? "无"),
-        "- 撤回链 dry-run exit：" + (ctx.retractStatus ?? "未跑"),
+        "- 撤回链 dry-run exit：" + (ctx.retractStatus ?? `未跑（${ctx.retractSkipped ?? "未触发"}）`),
         "- 判活口径：" + RULE_VERSION + "（" + ALIVE_RULE_TEXT + "）",
         "- 停机等待：" + (ctx.stopWait ? JSON.stringify(ctx.stopWait) : "未跑"),
         "- 起回等待：" + (ctx.startWait ? JSON.stringify(ctx.startWait) : "未跑"),

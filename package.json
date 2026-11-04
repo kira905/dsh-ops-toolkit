@@ -11,6 +11,9 @@
   "engines": {
     "node": ">=20"
   },
+  "scripts": {
+    "test": "node _test/owner-gate.test.mjs"
+  },
   "bin": {
     "dsh-boot-sync": "dsh-boot-sync.mjs",
     "dsh-bootstrap": "dsh-bootstrap.mjs",
