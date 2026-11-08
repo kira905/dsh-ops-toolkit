@@ -1,5 +1,28 @@
 # dsh-ops-toolkit
 
+## v0.2.0 — 2026-11-09
+
+**加了「管家工具箱」13 件**（锚点巡检 / 计划任务总览 / 说法台账 / 方案闸 / 交付前自审 / 手动动作回滚 /
+外源巡检 / 看门狗两件 / 配置快照 / 审计归档 / 快照 tick / 台账读取），布置在 `src/` 下，布局与它们原先
+在工具箱里的相对位置一致（`src/dsh-butler/*.mjs` + `src/dsh-butler/lib/` + `src/lib/`），所以件与件之间的
+相对 import 一行没改。按静态 import 闭包整棵搬：**70 件 / 1.7 MB**，不是 13 个入口单独搬（那样包起不来）。
+
+- **通知通道改成注入点**：原实现把「怎么把话说出去」写死在件里（厂商标识、凭据、对端别名都在）。开源版
+  只留**接口 + 默认空实现**：`installAlertTransport(fn)` 由宿主接真实通道；不接时 `sayAlert()` 如实返回
+  `no-transport`，一个字节都不外发。开关载体 = `butler-autonomy-limits.json#watchChannels.alert`（缺省关）。
+- **对端机名 / 盘符 / 用户名全部参数化**：快照镜像主机、回滚点盘符、tickd 入口、升级预检目录、流水目录
+  都走环境变量或同目录推导；`DSH_ALERT_TARGET` / `DSH_TICKD_SCRIPT` / `DSH_L0_TARBALLS` /
+  `DSH_REMOTE_BACKUP_DIR` 为本版新增旋钮。
+- **测试**：新增 `_test/src-smoke.test.mjs`（18 条）—— 13 件逐个 import、告警注入点三种状态、开关只改一个键
+  且回读一致、相对 import 不越出包根。`npm test` = 老夹具 + 新夹具。
+- **顺带修**：`self-review-check.mjs` 的自测夹具原来把流水文件名写死成某个月，跨月就跑红；改成按当月生成。
+  这不是开源版引入的问题，是原实现里就有的日历依赖。
+
+*English*: adds a 13-entry "butler toolbox" under `src/` (full 70-file import closure). The notification channel is
+now an injection point (`installAlertTransport`, default no-op, no bytes leave the process). Host names, drive
+letters and user names are parameterised via env vars. New smoke test covers imports, the seam, and the switch
+write path.
+
 ## v0.1.2 — 2026-11-04
 
 **把真实账号从代码里移除**（安全修复）。⚠️ 如实说明：**v0.1.1 及更早的包仍带着它**（已发布在 npm），

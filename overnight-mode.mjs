@@ -29,7 +29,7 @@
  *   自动对齐（仅 auto 用）：--grace-minutes 10（拔电后宽限多久才退保护） / --verify-hours 6（每隔几小时做一次真核自愈，0 = 关）
  *
  * 插电自动对齐（2026-10-16 加 · 卡「整夜模式 → 插电保护（常驻化四件套）」）
- *   主人令：「四件套都做，改叫插电保护，根据电源情况自己判断」。⇒ 不用再手动喊开关，
+ *   用户要求：「四件套都做，改叫插电保护，根据电源情况自己判断」。⇒ 不用再手动喊开关，
  *   `auto` 自己按电源状态对齐，两个驱动点：**DSH 生态开机链**（`dsh-start.ps1`，非阻塞）
  *   + **tickd 周期 job `plug-guard`**（10 分钟一轮）。
  *   判据 = kernel32 `GetSystemPowerStatus` 的 `ACLineStatus`（1 = 插电 / 0 = 电池 / 255 = 未知）：
@@ -72,7 +72,7 @@
  *   ⚠ 旧做法「net stop wuauserv / UsoSvc」已删除：非管理员根本做不到、WaaSMedicSvc 会把服务
  *     自愈拉起、停服务还可能让更新状态机变脏——收益低风险高，换成上面两层。
  *
- * 会话接力联动（2026-09-22 加 · 主人令「jobs 放进整夜模式脚本里」）
+ * 会话接力联动（2026-09-22 加 · 用户要求「jobs 放进整夜模式脚本里」）
  *   背景：会话接力 = 把快干满上下文的会话自动交接给新会话接着干（`tools/session-relay.mjs`）。
  *   它有一条 tickd 定时通道（job id = `relay`，5 分钟一轮）：无人值守时替卡执行会话自动写交接档、
  *   开接手会话、补标【已交接】。默认关（交付≠放行）——而整夜跑任务恰恰是「没人看着也要能交接」的场景。
@@ -1246,7 +1246,7 @@ function doAdopt(deps, opts) {
   }
   const dumpCache = new Map();
   const readDump = (f) => { if (!dumpCache.has(f)) dumpCache.set(f, fs.readFileSync(f, 'latin1')); return dumpCache.get(f); };
-  const dumpHeaderPlan = (f) => { const m = readDump(f).match(/GUID:\s*([0-9a-f-]{36})/i); return m ? m[1].toLowerCase() : null; };
+  const dumpHeaderPlan = (f) => { const m = readDump(f).match(/GUI<drive>\s*([0-9a-f-]{36})/i); return m ? m[1].toLowerCase() : null; };
   const files = fs.readdirSync(dir);
   const wholeDump = files.filter((f) => /powercfg-all-query/i.test(f)).map((f) => path.join(dir, f))[0] || null;
   function pickDump(plan) {
@@ -1629,7 +1629,7 @@ function selfTest() {
     assert(deps.calls.wu.some((c) => c.op === 'activeHours' && c.start === 21), 'L1 重新对齐');
   });
 
-  // ── 会话接力 job 联动（v1.2.0 · 主人令「jobs 放进整夜模式脚本里」）────────────────
+  // ── 会话接力 job 联动（v1.2.0 · 用户要求「jobs 放进整夜模式脚本里」）────────────────
   t('on 默认放行会话接力 job：原值被备份 + 真写到 true', () => {
     const deps = makeDeps();
     const r = doOn(deps, {});

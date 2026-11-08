@@ -26,7 +26,7 @@
 > 这套开源出来的是**能用的工具 + 装完自检 + 设计文档**。有两块**不在开源范围里**：
 >
 > 1. **「自己盯着活干」的那套引擎**：定时调度、队列盯守、管家日报、自主决定要不要动手 —— 这几件还没整理出来放（整理完会陆续放）。它的**设计本身是公开的**，写在 [`ops-handoff-design`](https://github.com/kira905/ops-handoff-design) 仓里，想自己实现的人照着做得到。
-> 2. **「出事喊到人」的通道**：企业微信、语音播报这类 —— **不随开源发布**。
+> 2. **「出事喊到人」的通道**：外部通道、语音播报这类 —— **不随开源发布**。
 >
 > 所以：装完你拿到的是一套**能用的工具**，不是一个会自己上班的管家。
 
@@ -146,6 +146,43 @@ DeepSeek Harness（DSH）的**运维与升级工具箱**：备份采集、宿主
 |---|---|---|---|
 | `overnight-mode.mjs` | 插电保护开关：插电时禁睡眠/休眠/关屏/合盖睡眠 + 堵 Windows 更新自动重启；拔电恢复 | `node overnight-mode.mjs auto` · `on` · `off` · `status` · `on --dry-run` · `--self-test` | `status` 只读；`on/off` 真改电源设置（`off` 按备份写回）；`--json` / `--force` / `--no-events` 通用 |
 | `overnight-guard-check.mjs` | 插电保护的**只读探针**：核对当前电源设置相对基线有没有被改 | `node overnight-guard-check.mjs` · `--json` · `--section` · `--fail-on-change` · `--self-test` | 绝不代劳改回（要改回请显式跑 `overnight-mode.mjs on`） |
+
+---
+
+## 管家工具箱（v0.2.0 新增 13 件，在 `src/dsh-butler/`）
+
+v0.1.x 那 16 件是「备份 / 升级 / 自检」；这一批是**管家日常**那套：巡检、台账、闸门、归档、快照。整棵按
+**静态 import 闭包**搬（70 件 / 1.7 MB），所以 `src/` 里除了 13 个入口，还有它们依赖的 `src/dsh-butler/lib/`
+与 `src/lib/` —— 别只搬入口，那样起不来。
+
+| 件 | 干什么 | 跑法 |
+|---|---|---|
+| `anchor-watch.mjs` | 锚点巡检：文档/记忆里的锚句跟正文对不上就报（含内建自检） | `node src/dsh-butler/anchor-watch.mjs [--apply] [--json]` · `--selftest` |
+| `schtask-overview.mjs` | 计划任务总览：该跑没跑 / 跑失败 / 跑着没完，一张表 | `node src/dsh-butler/schtask-overview.mjs [--all] [--selftest]` |
+| `said-ledger.mjs` | 说法台账：把「说了要做的事」跟「真落地的事」对账（可 --no-llm 纯规则跑） | `node src/dsh-butler/said-ledger.mjs [--date <日>] [--selftest]` |
+| `plan-gate.mjs` | 方案闸：方案档过不过闸，`--check / --pass / --fail` 三态落文件头 | `node src/dsh-butler/plan-gate.mjs --check --file <方案档>` |
+| `self-review-check.mjs` | 交付前自审：DoD 十条、待拍板段、路径悬空、流水缺行逐条挑 | `node src/dsh-butler/self-review-check.mjs --file <报告> [--self-test]` |
+| `manual-action-rollback.mjs` | 手动动作回滚：按关联 id 找那次动作，给回滚点与演练 | `node src/dsh-butler/manual-action-rollback.mjs --correlation <id> [--apply]` |
+| `butler-external.mjs` | 外源巡检：外部信号（新闻/公告/上游变更）采集与比对 | `node src/dsh-butler/butler-external.mjs --status` |
+| `butler-watch-fs.mjs` | 看门狗（文件面）：盯状态文件与日志的增长/停滞 | `node src/dsh-butler/butler-watch-fs.mjs --status` |
+| `butler-watch-channels.mjs` | 告警通道开关（桌宠 / 心跳 / 外部推送三条路，默认 dry-run） | `node src/dsh-butler/butler-watch-channels.mjs status` |
+| `config-snapshot.mjs` | 配置快照：把散在各处的配置收成一份可比对的快照（凭据 fail-closed 排除） | `node src/dsh-butler/config-snapshot.mjs --status` |
+| `butler-audit-archive.mjs` | 审计归档：审计流按月归档、算校验、查断点 | `node src/dsh-butler/butler-audit-archive.mjs --status` |
+| `dsh-snapshot-tick.mjs` | 快照 tick：按周期给 home 拍快照并做远端核验 | `node src/dsh-butler/dsh-snapshot-tick.mjs --status` |
+| `ledger-read.mjs` | 台账读取：把账本读成人能看的样子（也可 --json） | `node src/dsh-butler/ledger-read.mjs --status` |
+
+**外部推送通道是注入点，不是内置实现**。开源版里 `src/dsh-butler/lib/alert-hub.mjs` 只提供接口：
+
+```js
+import { installAlertTransport } from './src/dsh-butler/lib/alert-hub.mjs';
+installAlertTransport(async ({ target, text, kind }) => ({ ok: true, msgid: '…' }));
+```
+
+不注入 ⇒ `sayAlert()` 如实返回 `no-transport`，**一个字节都不外发**（这也是缺省值）。开关在
+`butler-autonomy-limits.json#watchChannels.alert`，缺省关。
+
+**跑这批件之前**：它们默认认 `~/.dsh` 与「工具树相对位置」，跨机或沙盒跑请给 `--home <dir>` 与对应环境变量
+（`DSH_ALERT_TARGET` / `DSH_TICKD_SCRIPT` / `DSH_L0_TARBALLS` / `DSH_REMOTE_BACKUP_DIR`）。
 
 ---
 

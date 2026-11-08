@@ -1,7 +1,7 @@
 {
   "name": "@kira905/dsh-ops-toolkit",
-  "version": "0.1.2",
-  "description": "DeepSeek Harness (DSH) operations & upgrade toolkit: backups, self-check, snapshots, upgrade audit/recovery/silence windows, plugged-in protection.",
+  "version": "0.2.0",
+  "description": "DeepSeek Harness (DSH) operations toolkit: backups, self-check, snapshots, upgrade audit/recovery/silence windows, plugged-in protection — plus the butler toolbox (anchors, plan gate, self-review, ledgers, audit archive, config snapshot, scheduled-task overview).",
   "license": "AGPL-3.0-only",
   "private": false,
   "publishConfig": {
@@ -12,7 +12,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node _test/owner-gate.test.mjs"
+    "test": "node _test/owner-gate.test.mjs && node _test/src-smoke.test.mjs"
   },
   "bin": {
     "dsh-boot-sync": "dsh-boot-sync.mjs",
@@ -26,12 +26,26 @@
     "overnight-guard-check": "overnight-guard-check.mjs",
     "overnight-mode": "overnight-mode.mjs",
     "snapshot-upgrade-pre": "snapshot-upgrade-pre.mjs",
-    "upgrade-triage-cli": "upgrade-triage-cli.mjs"
+    "upgrade-triage-cli": "upgrade-triage-cli.mjs",
+    "dsh-anchor-watch": "src/dsh-butler/anchor-watch.mjs",
+    "dsh-schtask-overview": "src/dsh-butler/schtask-overview.mjs",
+    "dsh-said-ledger": "src/dsh-butler/said-ledger.mjs",
+    "dsh-plan-gate": "src/dsh-butler/plan-gate.mjs",
+    "dsh-self-review-check": "src/dsh-butler/self-review-check.mjs",
+    "dsh-manual-action-rollback": "src/dsh-butler/manual-action-rollback.mjs",
+    "dsh-butler-external": "src/dsh-butler/butler-external.mjs",
+    "dsh-butler-watch-fs": "src/dsh-butler/butler-watch-fs.mjs",
+    "dsh-butler-watch-channels": "src/dsh-butler/butler-watch-channels.mjs",
+    "dsh-config-snapshot": "src/dsh-butler/config-snapshot.mjs",
+    "dsh-butler-audit-archive": "src/dsh-butler/butler-audit-archive.mjs",
+    "dsh-snapshot-tick": "src/dsh-butler/dsh-snapshot-tick.mjs",
+    "dsh-ledger-read": "src/dsh-butler/ledger-read.mjs"
   },
   "files": [
     "*.mjs",
     "*.ps1",
     "lib/",
+    "src/",
     "README.md",
     "README.en.md",
     "CHANGELOG.md",

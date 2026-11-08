@@ -29,7 +29,7 @@
 //   --json                      机读输出（stdout 只有 JSON）
 //   --home <dir>                目标机上的 .dsh 目录（默认由对端 CLI 自己解析 ~/.dsh）
 //   --state-dir <dir>           `--home` 的同义词（静默窗状态文件也在这个目录下）
-//   --ssh <alias>               显式指定 SSH 别名（默认 <HOST_C>-lan→<HOST_C> / tuf-lan→tuf 自动探测）
+//   --ssh <alias>               显式指定 SSH 别名（默认 <HOST_C>-lan→<HOST_C> / host-b-lan→tuf 自动探测）
 //   --wait-sec <n>              apply 后等守护鱼接管的最长秒数（默认 120）
 //   --poll-sec <n>              等待轮询间隔（默认 5）
 //   --reason <text>             clear / enable 的原因（远端目标要求纯 ASCII）

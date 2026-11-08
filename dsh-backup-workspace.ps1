@@ -39,7 +39,7 @@
 # 设计（docs\git交接迁移方案-20260907.md §3 仓3）：
 #   1. 仓库本体在盘外 DSH_ROOT-offsync\git-backup\dsh-workspace，绝不进百度同步目录
 #   2. 白名单采集；绝不带 _archive/_tmp/generated/logs/snapshots/backups/node_modules/*.zip
-#   3. 敏感文件单独 git-crypt 加密（tools/setup-tuf-api.mjs、docs/API资产与定价.md）
+#   3. 敏感文件单独 git-crypt 加密（tools/setup-peer-api.mjs、docs/API资产与定价.md）
 #   4. 与仓1/仓2 共用同一把 git-crypt key（一套 key 管三仓，key 丢失=密文永久不可读）
 
 param(
@@ -76,7 +76,7 @@ $ExcludeFiles = @('*.zip', '*.tmp', '*.bak*', '*.old', '*.orig', '*.before-resto
 #    clean/smudge 走管道不受影响（日常提交正常，解锁可删文件后 `git checkout -- .` 兜底）。
 #    => docs/ 下中文文档若有敏感内容：先脱敏（明文 key 改为指向 .credentials.yaml），不要列入本清单。
 $EncryptedPaths = @(
-    'tools/setup-tuf-api.mjs'
+    'tools/setup-peer-api.mjs'
     'tools/phone-proxy-config.json'
 )
 # ---------- 目录级加密模式（通配）----------
@@ -458,7 +458,7 @@ function Assert-PushSafe {
         Write-Warn2 '   ③ 工具或文件缺失（对端生产没有新版）：先让它过河——跑 Arrive 的分发段（A6b 会补 tools/**、docs/**、skills/**）：'
         Write-Warn2 '      node tools\dsh-butler\handoff.mjs --arrive                # 默认 report-only，先看清单'
         Write-Warn2 '      node tools\dsh-butler\handoff.mjs --arrive --adopt-apply  # 确认干净后本轮真写'
-        Write-Warn2 '      兜底（只覆盖不删除、逐个备份）：node tools\tuf-adopt-repo-newer-files.mjs --apply'
+        Write-Warn2 '      兜底（只覆盖不删除、逐个备份）：node tools\host-b-adopt-repo-newer-files.mjs --apply'
         throw "PUSH BLOCKED（真因：工具未返回 blocking 口径，gate='$($res.Gate)'）—— fail-closed 拒绝推送。按上面 ①②③ 逐条定位（多数是编码或对端缺新版文件），**不要**用 -ForcePush 掩盖。"
     }
     if ($res.ExitCode -eq 0) {

@@ -1,6 +1,6 @@
 ﻿<#
 .SYNOPSIS
-  dsh-selfcheck.ps1 — DSH 环境自检脚本（本鱼技能树产物）
+  dsh-selfcheck.ps1 — DSH 环境自检脚本（助手技能树产物）
 
 .DESCRIPTION
   把"DSH 折腾坑清单"变成可一键运行的只读自检：
@@ -20,7 +20,7 @@
        Get-ChildItem -Recurse 会跟随 DSH_ROOT 下 10 个 junction 走进 DSH_ROOT-offsync 实体树，
        实测 152.5s / 116208 文件 ⇒ 修后 4.6s / 9055 文件（node 探针同口径基准）。
     b) §7 扫描面收窄到"我们自己维护的注入页"白名单（assets / dsh-emoji-plugin / tools +
-       根一层）。范围外的 HTML（docs\舆情监测 外抓站快照、docs\企微…官方留档、
+       根一层）。范围外的 HTML（docs\舆情监测 外抓站快照、docs\外部通道…官方留档、
        _tmp 抓站件等）不计入、也不报 FAIL —— 否则只跳 junction 会让 §7 恒报 14 条假红。
        判据不变：`<script` 与 `</script>` 计数比对，只对白名单内文件判 FAIL。
 
@@ -343,7 +343,7 @@ else {
   }
 }
 Write-Host "       扫描面 = assets/dsh-emoji-plugin/tools（递归，跳 junction）+ 根一层；命中 $(($scanned -join ' · '))" -ForegroundColor DarkGray
-Write-Host "       范围外 $outsideCount 个 HTML 不计入（外抓站快照/官方留档/临时抓站件：docs\舆情监测、docs\企微…、_tmp 等）" -ForegroundColor DarkGray
+Write-Host "       范围外 $outsideCount 个 HTML 不计入（外抓站快照/官方留档/临时抓站件：docs\舆情监测、docs\外部通道…、_tmp 等）" -ForegroundColor DarkGray
 T $sw
 
 # ---------- 8. launcherMain 两份同源（guard.mjs ↔ guard-launcher.mjs） ----------
